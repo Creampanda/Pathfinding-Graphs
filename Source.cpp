@@ -53,18 +53,19 @@ public:
 
 };
 
-int Node::idGenerator_ = 1;
+int Node::idGenerator_ = 0;
 
 class Graph
 {   //Количество вершин
+	size_t rows_ = 0;
 	size_t vertices_ = 0;
 	//Вектор хранящий все вершины графа
 	vector <Node> nodeVector_;  
 public:
 
-	Graph(size_t vertices) : vertices_(vertices)
+	Graph(size_t rows) : rows_(rows), vertices_(rows*rows)
 	{
-		for (size_t i = 0; i < vertices; i++)
+		for (size_t i = 0; i < rows * rows; i++)
 		{
 			Node a;
 			nodeVector_.push_back(a);
@@ -85,7 +86,26 @@ public:
 	//Соединяем вершины
 	void connectNodes(int src, int dest)
 	{
-		nodeVector_[src-1].adjustNode(nodeVector_[dest-1]);
+		nodeVector_[src].adjustNode(nodeVector_[dest]);
+	}
+
+	//Делаем сетку 
+	void makeGrid()
+	{
+		for (size_t i = 0; i < rows_; ++i)
+		{
+			for (size_t j = rows_*i; j < rows_*(i + 1) - 1; ++j)
+			{
+				connectNodes(j, j + 1);
+			}
+		}
+		for (size_t i = 0; i < rows_; ++i)
+		{
+			for (size_t j = i; j < rows_ * (rows_ - 1) + i; j+= rows_)
+			{
+				connectNodes(j, j + rows_);
+			}
+		}
 	}
 };
 
@@ -94,12 +114,9 @@ public:
 int main()
 {
 
-	Graph graph(5);
-	graph.connectNodes(1, 2);
-	graph.connectNodes(2, 3);
-	graph.connectNodes(1, 4);
+	Graph graph(3);
+	graph.makeGrid();
 
-	graph.connectNodes(1, 5);
 	graph.showGraph();
 
 
