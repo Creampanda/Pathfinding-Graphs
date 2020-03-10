@@ -22,6 +22,12 @@ public:
 	void makeGrid();
 
 	void BFS(int startingNode, int targetNode);
+
+	list<int> pathfinding(int startingNide, int targetNode);
+	void showpath(list<int> path);
+	
+	void disableNode(int node);
+
 };
 
 

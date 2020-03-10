@@ -24,6 +24,18 @@ void Node::showNode()
 
 }
 
-list<int> Node::getAdjList() {return adjList_;}
+void Node::setStep(int step)
+{
+	this->steps_ = step;
+}
+
+int Node::getStep()
+{
+	return steps_;
+}
+
+list<int> Node::getAdjList() {return	adjList_;}
+
+list<int>& Node::getAdjListRef() { return	adjList_; }
 
 int Node::getId() { return id_; };

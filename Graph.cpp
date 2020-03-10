@@ -50,6 +50,7 @@ void Graph::makeGrid()
 // breadth-first search
 void Graph::BFS(int startingNode, int targetNode)
 {
+	nodeVector_.at(startingNode).setStep(0);
 	//Bool array for visited vertices
 	bool* visited = new bool[vertices_];
 	for (size_t i = 0; i < vertices_; i++)
@@ -72,17 +73,87 @@ void Graph::BFS(int startingNode, int targetNode)
 		cout << "Checking adj list for vertex " << current << endl;
 		for (auto i = currentNodeAdjList.begin(); i!= currentNodeAdjList.end(); ++i )
 		{
+			
 			if (*i == targetNode)
 			{
 				cout << "We found target Node!! It's connected with " << current << endl;
+				nodeVector_.at(*i).setStep(nodeVector_.at(current).getStep() + 1);
+				cout << "Can get here by " << nodeVector_.at(*i).getStep() << " steps!" << endl;
+				list<int> path = this->pathfinding(startingNode, targetNode);
+				this->showpath(path);
 				return;
 			}
 			if (!visited[*i])
 			{
+				// Setting how many step it takes to get to that node
+				nodeVector_.at(*i).setStep(nodeVector_.at(current).getStep() + 1);
+				cout << "Amount steps to " << nodeVector_.at(*i).getId() << " : " << nodeVector_.at(*i).getStep() << endl;
 				cout << "Visit and enqueue " << *i << endl;
 				visited[*i] = true;
 				queue.push_back(*i);
 			}
 		}
 	}
+	cout << "Sorry! Can't find a path to node!" << endl;
+
+}
+
+list<int> Graph::pathfinding(int startingNode, int targetNode)
+{
+	int currentNode = targetNode;
+	list<int> path;
+	while (nodeVector_.at(currentNode).getStep() != 0)
+	{
+		list<int> currentNodeAdjList = nodeVector_.at(currentNode).getAdjList();
+		
+		int nextstep;
+		for (auto i = currentNodeAdjList.begin(); i != currentNodeAdjList.end(); ++i)
+		{
+			if (nodeVector_.at(*i).getStep() >= 0)
+			{
+				nextstep = *i;
+				break;
+			}
+		}
+		for (auto i = currentNodeAdjList.begin(); i != currentNodeAdjList.end(); ++i)
+		{
+			if (nodeVector_.at(*i).getStep() >= 0)
+			{
+				if (nodeVector_.at(*i).getStep() < nodeVector_.at(nextstep).getStep())
+				{
+					nextstep = *i;
+				}
+			}
+
+		}
+
+		currentNode = nextstep;
+		path.push_front(nextstep);
+	}
+
+	path.push_back(targetNode);
+
+	return path;
+}
+
+void Graph::showpath(list<int> path)
+{
+	auto i = path.begin();
+	cout << *(i++);
+	while (i != path.end())
+	{
+		cout << " -> " << *i++;
+	}
+
+	cout << endl;
+}
+
+void Graph::disableNode(int nodeId)
+{
+	for (auto i = nodeVector_.at(nodeId).getAdjListRef().begin(); i != nodeVector_.at(nodeId).getAdjListRef().end(); i++)
+	{
+		nodeVector_.at(*i).getAdjListRef().remove(nodeId);
+	}
+
+	nodeVector_.at(nodeId).getAdjListRef().clear();
 }
